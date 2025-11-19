@@ -45,6 +45,7 @@ android {
 dependencies {
 
     implementation(project(":data"))
+    implementation(project(":common"))
     implementation("androidx.room:room-runtime:2.8.3")
     kapt("androidx.room:room-compiler:2.8.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")

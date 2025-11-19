@@ -1,57 +1,51 @@
 package com.ramazan.currencyconverter.ui.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ramazan.common.Resource
 import com.ramazan.data.repository.CurrencyRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class CurrencyViewModel(private val repository: CurrencyRepository): ViewModel() {
-    private var currencyListNames = MutableLiveData<List<String>>()
-    fun getCurrencyList(): MutableLiveData<List<String>> = currencyListNames
+class CurrencyViewModel(private val repository: CurrencyRepository) : ViewModel() {
 
-    private var currencyConvert = MutableLiveData<String>()
-    fun getCurrencyConvert(): MutableLiveData<String> = currencyConvert
+    private val _currencyNames = MutableStateFlow<Resource<List<String>>>(Resource.Loading())
+    val currencyNames: StateFlow<Resource<List<String>>> = _currencyNames
 
+    private val _conversionResult = MutableStateFlow<Resource<String>>(Resource.Success(""))
+    val conversionResult: StateFlow<Resource<String>> = _conversionResult
 
-
-
-    init{
+    init {
         loadCurrencyArray()
     }
 
-    fun loadCurrencyArray(){
-        viewModelScope.launch {
-            try{
-                val response = repository.fetchAndSaveRates("USD")
-                Log.i("RETROFIT", "loadCurrencyArray: $response")
-
-                val saveRates = repository.getRatesFromDb()
-
-                currencyListNames.value = saveRates.map { it.currency }
+    fun loadCurrencyArray() {
+        repository.getRates("USD")
+            .onEach { result ->
+                _currencyNames.value = result
             }
-            catch (e: Exception){
-                Log.e("ERROR RETROFIT", "$e")
+            .launchIn(viewModelScope)
+    }
+
+    fun convert(from: String, to: String, amountStr: String) {
+        val amount = amountStr.toDoubleOrNull()
+        if (amount == null) {
+            _conversionResult.value = Resource.Error("Неверная сумма")
+            return
+        }
+
+        viewModelScope.launch {
+            _conversionResult.value = Resource.Loading()
+            try {
+                val rate = repository.getSingleRate(from, to)
+                val resultValue = amount * rate
+                _conversionResult.value = Resource.Success(String.format("%.2f %s", resultValue, to))
+            } catch (e: Exception) {
+                _conversionResult.value = Resource.Error("Ошибка конвертации")
             }
         }
     }
-
-
-
-    fun convert(from: String, to: String, amount: Double){
-        viewModelScope.launch {
-            try{
-                val response = repository.getRates(from)
-                val rates = response.conversionRates[to]
-                Log.i("RETROFIT", "convert: $rates")
-                currencyConvert.value = "Результат конвертации: ${amount * (rates ?: 0.0)}"
-            }
-            catch (e: Exception){
-                Log.i("ERROR RETROFIT", "convert: $e")
-            }
-        }
-    }
-
-
 }

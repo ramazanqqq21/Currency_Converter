@@ -37,6 +37,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":common"))
     implementation("androidx.room:room-runtime:2.8.3")
     kapt("androidx.room:room-compiler:2.8.3")
     implementation("com.squareup.retrofit2:retrofit:3.0.0")

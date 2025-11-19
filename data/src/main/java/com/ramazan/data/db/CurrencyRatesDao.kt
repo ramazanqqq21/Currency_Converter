@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CurrencyRatesDao {
@@ -12,5 +13,5 @@ interface CurrencyRatesDao {
     suspend fun insertRates(rates: List<CurrencyRatesEntity>)
 
     @Query("SELECT * FROM currency_rates")
-    suspend fun getAllRates(): List<CurrencyRatesEntity>
+    fun getAllRates(): Flow<List<CurrencyRatesEntity>>
 }

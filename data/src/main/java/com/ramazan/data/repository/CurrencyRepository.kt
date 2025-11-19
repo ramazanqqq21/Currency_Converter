@@ -1,29 +1,38 @@
 package com.ramazan.data.repository
 
+import com.ramazan.common.Resource
 import com.ramazan.data.api.CurrencyApi
 import com.ramazan.data.db.CurrencyRatesDao
 import com.ramazan.data.db.CurrencyRatesEntity
-import com.ramazan.data.model.CurrencyResponse
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class CurrencyRepository(
-    private val api : CurrencyApi,
-    private val dao : CurrencyRatesDao,
-){
-    suspend fun fetchAndSaveRates(baseCode: String){
-        val response = api.getRates(baseCode)
+    private val api: CurrencyApi,
+    private val dao: CurrencyRatesDao,
+) {
+    fun getRates(baseCurrency: String): Flow<Resource<List<String>>> = flow {
+        emit(Resource.Loading())
 
-        val ratesForDb = response.conversionRates.map {
-            (currencyCode, rate) ->
-            CurrencyRatesEntity(currencyCode, rate)
+        try {
+            val response = api.getRates(baseCurrency)
+            val ratesForDb = response.conversionRates.map { (code, rate) ->
+                CurrencyRatesEntity(currency = code, rate = rate)
+            }
+            dao.insertRates(ratesForDb)
+
+        } catch (e: Exception) {
+            emit(Resource.Error("Ошибка сети: не удалось обновить данные. ${e.message}"))
         }
 
-        dao.insertRates(ratesForDb)
+        dao.getAllRates().collect { dbRates ->
+            val currencyCodes = dbRates.map { it.currency }
+            emit(Resource.Success(currencyCodes))
+        }
     }
 
-    suspend fun getRatesFromDb(): List<CurrencyRatesEntity>{
-        return dao.getAllRates()
-    }
-    suspend fun getRates(baseCode: String): CurrencyResponse{
-        return RetrofitInstance.api.getRates(baseCode)
+    suspend fun getSingleRate(from: String, to: String): Double {
+        val response = api.getRates(from)
+        return response.conversionRates[to] ?: 0.0
     }
 }

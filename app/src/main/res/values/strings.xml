@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Currency Converter</string>
+    <string name="currency_prompt_1">Валюта</string>
+    <string name="currency_prompt_2">Валюта2</string>
+    <string name="enter_amount_hint">Введите сумму</string>
+    <string name="convert_button_text">Конвертировать</string>
 </resources>

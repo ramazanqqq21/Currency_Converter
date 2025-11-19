@@ -1,4 +1,4 @@
-package com.ramazan.currencyconverter.utils
+package com.ramazan.common
 
 sealed class Resource<T>(
     val data: T? = null,
