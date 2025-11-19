@@ -27,13 +27,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
-
         val dao = (application as App).database.currencyRatesDao()
         val repository = CurrencyRepository(RetrofitInstance.api, dao)
         viewModel = CurrencyViewModel(repository)
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
 
 
         binding.btnCurrency.setOnClickListener {
@@ -80,23 +80,20 @@ class MainActivity : AppCompatActivity() {
             viewModel.conversionResult.collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        binding.progressBar.visibility = View.VISIBLE // Можно использовать отдельный ProgressBar для результата
-                        binding.twResult.visibility = View.GONE // Скрываем старый результат
-                        binding.btnCurrency.isEnabled = false // Блокируем кнопку, пока идет расчет
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.twResult.visibility = View.GONE
+                        binding.btnCurrency.isEnabled = false
                     }
 
                     is Resource.Success -> {
-                        // 2. Показываем успешный результат
                         binding.progressBar.visibility = View.GONE
                         binding.twResult.visibility = View.VISIBLE
                         binding.btnCurrency.isEnabled = true
 
-                        // Устанавливаем итоговое значение в TextView
                         binding.twResult.text = resource.data
                     }
 
                     is Resource.Error -> {
-                        // 3. Показываем ошибку
                         binding.progressBar.visibility = View.GONE
                         binding.twResult.visibility = View.GONE
                         binding.btnCurrency.isEnabled = true

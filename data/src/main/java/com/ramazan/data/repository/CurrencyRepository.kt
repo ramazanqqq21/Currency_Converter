@@ -1,5 +1,6 @@
 package com.ramazan.data.repository
 
+import android.util.Log
 import com.ramazan.common.Resource
 import com.ramazan.data.api.CurrencyApi
 import com.ramazan.data.db.CurrencyRatesDao
@@ -16,6 +17,7 @@ class CurrencyRepository(
 
         try {
             val response = api.getRates(baseCurrency)
+            Log.d("CurrencyRepository", "Response: $response")
             val ratesForDb = response.conversionRates.map { (code, rate) ->
                 CurrencyRatesEntity(currency = code, rate = rate)
             }

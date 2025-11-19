@@ -1,5 +1,6 @@
 package com.ramazan.currencyconverter.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ramazan.common.Resource
@@ -26,6 +27,7 @@ class CurrencyViewModel(private val repository: CurrencyRepository) : ViewModel(
         repository.getRates("USD")
             .onEach { result ->
                 _currencyNames.value = result
+                Log.d("CurrencyViewModel", "Currency names loaded: ${result.data}")
             }
             .launchIn(viewModelScope)
     }
