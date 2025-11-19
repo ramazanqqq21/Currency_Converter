@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="user"
-            type="com.ramazan.currencyconverter.viewmodel.ViewModel" />
+            name="viewModel"
+            type="com.ramazan.currencyconverter.ui.viewmodel.CurrencyViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,10 +16,12 @@
 
         <Spinner
             android:id="@+id/spinnerCurrency1"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:prompt="Валюта"
             android:textSize="40sp"
+
+            app:entries="@{viewModel.currencyList}"
 
             android:layout_margin="10dp"
 
@@ -31,12 +33,13 @@
 
         <Spinner
             android:id="@+id/spinnerCurrency2"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:prompt="Валюта2"
             android:textSize="40sp"
             android:layout_margin="10dp"
 
+            app:entries="@{viewModel.currencyList}"
 
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/spinnerCurrency1"
@@ -98,7 +101,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:text="Результат:"
+            android:text="@{viewModel.currencyConvert}"
             android:textSize="30sp"
             android:gravity="start"
 
