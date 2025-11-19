@@ -18,10 +18,12 @@ fun Spinner.bindEntries(data: StateFlow<Resource<List<String>>>?) {
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             this.adapter = arrayAdapter
             this.visibility = View.VISIBLE
-        } else {
+        }
+        else {
             this.visibility = View.GONE
         }
-    } else {
+    }
+    else {
         this.visibility = View.GONE
     }
 }

@@ -18,8 +18,8 @@ class CurrencyRepository(
         try {
             val response = api.getRates(baseCurrency)
             Log.d("CurrencyRepository", "Response: $response")
-            val ratesForDb = response.conversionRates.map { (code, rate) ->
-                CurrencyRatesEntity(currency = code, rate = rate)
+            val ratesForDb = response.conversionRates.map { (currency, rate) ->
+                CurrencyRatesEntity(currency, rate)
             }
             dao.insertRates(ratesForDb)
 
